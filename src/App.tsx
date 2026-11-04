@@ -263,13 +263,14 @@ function Pricing() {
       </SectionHeading>
       <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-2">
         <PriceCard name="Free" price="$0" note="Forever" items={free} cta="Download" href={site.downloadURL} />
-        <PriceCard name="Pro" price={site.proPrice} note="One-time" items={pro} cta={`Buy Pro`} href={site.buyURL} highlight />
+        <PriceCard name="Pro" price={site.proPrice} note="One-time" items={pro} cta="Request a licence" href={site.buyURL} highlight
+          footnote="Easiest from the app: Settings → License → Email Licence Request. Your Mac ID is filled in for you." />
       </div>
     </section>
   );
 }
 
-function PriceCard({ name, price, note, items, cta, href, highlight = false }: {
+function PriceCard({ name, price, note, items, cta, href, highlight = false, footnote }: {
   name: string;
   price: string;
   note: string;
@@ -277,6 +278,7 @@ function PriceCard({ name, price, note, items, cta, href, highlight = false }: {
   cta: string;
   href: string;
   highlight?: boolean;
+  footnote?: string;
 }) {
   return (
     <motion.div {...reveal} className={`glass relative flex flex-col rounded-[32px] p-8 ${highlight ? "ring-2 ring-ink/80" : ""}`}>
@@ -302,6 +304,7 @@ function PriceCard({ name, price, note, items, cta, href, highlight = false }: {
       >
         {cta}
       </a>
+      {footnote && <p className="mt-3 text-center text-[12.5px] leading-relaxed text-muted">{footnote}</p>}
     </motion.div>
   );
 }
@@ -310,7 +313,7 @@ const faqs: { q: string; a: string }[] = [
   { q: "Which Macs does it work on?", a: `MacBooks with a notch running macOS 14 or later. On other displays NotchOS draws a virtual notch.` },
   { q: "How do I open it the first time?", a: "Right-click NotchOS in Applications and choose Open, or allow it in System Settings → Privacy & Security. You only do this once." },
   { q: "What permissions does it need?", a: "Accessibility, to show the volume and brightness HUD, and permission to read Music or Spotify for album art. Everything else works without them." },
-  { q: "How does the Pro licence work?", a: `Every Pro feature is free for ${site.trialDays} days. After you buy, your licence key arrives by email; paste it in Settings → License.` },
+  { q: "How does the Pro licence work?", a: `Every Pro feature is free for ${site.trialDays} days. To get Pro, open Settings → License and click Email Licence Request: it sends your Mac ID to ${site.licenseEmail}. Your licence key comes back by reply; paste it in Settings → License.` },
 ];
 
 function FAQ() {
