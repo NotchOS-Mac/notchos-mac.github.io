@@ -51,13 +51,11 @@ function Nav() {
 }
 
 function Logo() {
+  // The app icon has transparent padding around its squircle; scale it up so the squircle fills the slot.
   return (
-    <svg viewBox="0 0 16 16" className="crisp h-7 w-7" aria-hidden="true">
-      <rect width="16" height="16" rx="4" fill="#17150f" />
-      <rect x="3" y="4" width="10" height="4" fill="#f6f1e8" />
-      <rect x="4" y="8" width="8" height="1" fill="#f6f1e8" />
-      <rect x="11" y="11" width="2" height="2" fill="#e9973c" />
-    </svg>
+    <span className="relative block h-7 w-7 overflow-visible" aria-hidden="true">
+      <img src="/notchos-icon.svg" alt="" className="absolute -inset-[3px] h-[calc(100%+6px)] w-[calc(100%+6px)] max-w-none" />
+    </span>
   );
 }
 
