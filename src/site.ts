@@ -15,7 +15,7 @@ Thanks!`;
 export const site = {
   name: "NotchOS",
   /** Permanent link to the newest build (public releases repo). */
-  downloadURL: "https://github.com/Bexwane/NotchOS-releases/releases/latest/download/NotchOS.zip",
+  downloadURL: "https://github.com/NotchOS-Mac/NotchOS-releases/releases/latest/download/NotchOS.dmg",
   /** For now a licence request by email; later, a Lemon Squeezy / Gumroad checkout link. */
   buyURL: `mailto:${licenseEmail}?subject=${encodeURIComponent("NotchOS Pro licence request")}&body=${encodeURIComponent(requestBody)}`,
   licenseEmail,

@@ -308,6 +308,7 @@ function PriceCard({ name, price, note, items, cta, href, highlight = false, foo
 }
 
 const faqs: { q: string; a: string }[] = [
+  { q: "macOS says it can’t verify the developer. Is that OK?", a: "Yes. NotchOS isn’t notarized by Apple yet, so the first time you open it, go to System Settings → Privacy & Security and click Open Anyway next to NotchOS. After that it opens normally." },
   { q: "Which Macs does it work on?", a: `MacBooks with a notch running macOS 14 or later. On other displays NotchOS draws a virtual notch.` },
   { q: "How do I open it the first time?", a: "Right-click NotchOS in Applications and choose Open, or allow it in System Settings → Privacy & Security. You only do this once." },
   { q: "What permissions does it need?", a: "Accessibility, to show the volume and brightness HUD, and permission to read Music or Spotify for album art. Everything else works without them." },
