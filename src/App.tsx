@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { NotchDemo } from "./components/NotchDemo";
 import { AppIcon, AppIconTile, type IconName } from "./components/AppIcon";
+import { DownloadCount } from "./components/DownloadCount";
 import { site } from "./site";
 
 const reveal = {
@@ -343,6 +344,7 @@ function Footer() {
         <p className="label text-[10px]">Made for the top of your screen</p>
         <a href={`mailto:${site.supportEmail}`} className="hover:text-ink">Support</a>
       </div>
+      <DownloadCount />
     </footer>
   );
 }
