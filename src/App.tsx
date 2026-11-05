@@ -67,9 +67,9 @@ function Hero() {
           <span className="h-1.5 w-1.5 rounded-full bg-amber" /> for MacBooks with a notch
         </span>
         <h1 className="mt-7 text-[44px] font-semibold leading-[1.04] tracking-[-0.035em] md:text-[76px]">
-          The notch,
+          The notch
           <br />
-          <span className="text-ink-soft">finally useful.</span>
+          <span className="text-ink-soft">just woke up.</span>
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-ink-soft md:text-[19px]">
           NotchOS turns the black cut-out at the top of your MacBook into a live surface for music, timers, files and
