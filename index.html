@@ -10,8 +10,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet" />
+    <!-- If scripts never load, the black first-frame cover still steps aside. -->
+    <style>@keyframes boot-out{to{opacity:0;visibility:hidden}}#boot{animation:boot-out .4s 4s forwards}</style>
   </head>
   <body>
+    <!-- A black cover for the first frame, so the page never flashes before the intro; the intro removes it. -->
+    <div id="boot" style="position:fixed;inset:0;z-index:99;background:#000"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,4 +1,4 @@
-import { AlarmClock, Brain, FileText, Inbox, KeyRound, Lock, Music, Radio, Sun, Timer, Zap, type LucideIcon } from "lucide-react";
+import { AlarmClock, Brain, Eye, FileText, Globe, Headphones, Inbox, KeyRound, Lock, Music, Presentation, Radio, Sun, Timer, Vibrate, Zap, type LucideIcon } from "lucide-react";
 
 /**
  * The app's icons. In NotchOS they are SF Symbols in a circle of the app's colour (Pomodoro is
@@ -17,6 +17,11 @@ const icons = {
   lock: { icon: Lock, tint: "#1C1C1E" }, // Lock screen
   file: { icon: FileText, tint: "#8E8E93" },
   key: { icon: KeyRound, tint: "#8E8E93" },
+  headphones: { icon: Headphones, tint: "#34C759" }, // Device animations
+  glance: { icon: Eye, tint: "#AF52DE" }, // Glance
+  globe: { icon: Globe, tint: "#30B0C7" }, // Team clocks
+  haptics: { icon: Vibrate, tint: "#8E8E93" }, // Haptic feedback
+  present: { icon: Presentation, tint: "#1C1C1E" }, // Presentation mode
 } satisfies Record<string, { icon: LucideIcon; tint: string }>;
 
 export type IconName = keyof typeof icons;

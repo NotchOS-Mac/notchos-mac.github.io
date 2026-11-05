@@ -7,18 +7,20 @@ const BASE_WIDTH = 1000;
 const BASE_HEIGHT = 360;
 const PT = 1.43;
 
-type StateID = "idle" | "music" | "musicOpen" | "timer" | "library" | "drop";
+type StateID = "idle" | "music" | "musicOpen" | "timer" | "glance" | "airpods" | "library" | "drop";
 
 const states: Record<StateID, { label: string; width: number; height: number; top: number; bottom: number }> = {
   idle: { label: "Resting", width: 184, height: 31, top: 3, bottom: 9 },
   music: { label: "Music", width: 261, height: 32, top: 6, bottom: 16 },
   musicOpen: { label: "Expanded", width: 420, height: 120, top: 18, bottom: 34 },
   timer: { label: "Timer", width: 300, height: 32, top: 6, bottom: 16 },
+  glance: { label: "Glance", width: 230, height: 52, top: 6, bottom: 16 },
+  airpods: { label: "AirPods", width: 300, height: 32, top: 6, bottom: 16 },
   library: { label: "Library", width: 260, height: 105, top: 18, bottom: 34 },
   drop: { label: "Drop files", width: 420, height: 140, top: 18, bottom: 34 },
 };
 
-const tour: StateID[] = ["music", "musicOpen", "timer", "library", "drop", "idle"];
+const tour: StateID[] = ["music", "musicOpen", "timer", "glance", "airpods", "library", "drop", "idle"];
 const spring = { type: "spring", stiffness: 260, damping: 28, mass: 0.9 } as const;
 
 export function NotchDemo() {
@@ -51,6 +53,19 @@ export function NotchDemo() {
           <div className="absolute left-0 top-0 origin-top-left" style={{ width: BASE_WIDTH, height: BASE_HEIGHT, transform: `scale(${scale})` }}>
             <Wallpaper />
             <MenuBar />
+            <AnimatePresence>
+              {state === "glance" && (
+                <motion.div
+                  key="pointer"
+                  className="absolute left-1/2 top-[10px] z-10 ml-[40px]"
+                  initial={{ opacity: 0, x: 60, y: 90 }}
+                  animate={{ opacity: 1, x: 0, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }}
+                  exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                >
+                  <Cursor />
+                </motion.div>
+              )}
+            </AnimatePresence>
             <div className="absolute left-1/2 top-0 -translate-x-1/2">
               <motion.div
                 className="relative bg-black"
@@ -142,11 +157,102 @@ function NotchContent({ state }: { state: StateID }) {
           <Countdown />
         </Row>
       );
+    case "glance":
+      return <GlanceRow />;
+    case "airpods":
+      return (
+        <Row>
+          <motion.div initial={{ scale: 0.4, opacity: 0, y: -6 }} animate={{ scale: 1, opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 300, damping: 16, delay: 0.15 }}>
+            <AirPodsGlyph />
+          </motion.div>
+          <BatteryRing percent={82} />
+        </Row>
+      );
     case "library":
       return <Library />;
     case "drop":
       return <DropZone />;
   }
+}
+
+/** The glance: rest the pointer on the notch and a quiet row grows out under it. */
+function GlanceRow() {
+  return (
+    <div className="flex h-full items-end justify-center pb-[10px]">
+      <motion.div
+        className="flex items-center gap-[22px] text-[15px] font-semibold text-white/85"
+        initial={{ opacity: 0, y: -4 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.3 }}
+      >
+        <span className="flex items-center gap-[7px]">
+          <MiniRing percent={64} color="#f0a04b" />
+          <Countdown small />
+        </span>
+        <span className="flex items-center gap-[7px]">
+          <AlbumArt size={19} />
+          Golden Hour
+        </span>
+      </motion.div>
+    </div>
+  );
+}
+
+/** AirPods, drawn for the site (Apple's symbols can't be used on the web). */
+function AirPodsGlyph() {
+  return (
+    <svg viewBox="0 0 40 28" className="h-[30px] w-[42px]" aria-label="AirPods">
+      {[{ head: 12, stem: 13.2, grille: 9.6 }, { head: 28, stem: 22.8, grille: 30.4 }].map((bud) => (
+        <g key={bud.head}>
+          <ellipse cx={bud.head} cy="9" rx="7" ry="6.4" fill="#f5f5f7" />
+          <rect x={bud.stem} y="10" width="4" height="15.5" rx="2" fill="#f5f5f7" />
+          <ellipse cx={bud.grille} cy="8.6" rx="2" ry="1.3" fill="#b9b9be" />
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+/** The battery, filling up as the device lands. */
+function BatteryRing({ percent }: { percent: number }) {
+  const radius = 11;
+  const circumference = 2 * Math.PI * radius;
+  return (
+    <span className="flex items-center gap-[10px] text-[19px] font-semibold tabular-nums text-[#30d158]">
+      <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}>{percent}%</motion.span>
+      <svg viewBox="0 0 28 28" className="h-[26px] w-[26px] -rotate-90">
+        <circle cx="14" cy="14" r={radius} fill="none" stroke="rgba(48,209,88,0.25)" strokeWidth="3.4" />
+        <motion.circle
+          cx="14" cy="14" r={radius} fill="none" stroke="#30d158" strokeWidth="3.4" strokeLinecap="round"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: circumference * (1 - percent / 100) }}
+          transition={{ delay: 0.35, duration: 0.9, ease: "easeOut" }}
+        />
+      </svg>
+    </span>
+  );
+}
+
+function MiniRing({ percent, color }: { percent: number; color: string }) {
+  const radius = 7;
+  const circumference = 2 * Math.PI * radius;
+  return (
+    <svg viewBox="0 0 18 18" className="h-[19px] w-[19px] -rotate-90">
+      <circle cx="9" cy="9" r={radius} fill="none" stroke={color} strokeOpacity="0.3" strokeWidth="2.6" />
+      <circle cx="9" cy="9" r={radius} fill="none" stroke={color} strokeWidth="2.6" strokeLinecap="round"
+        strokeDasharray={circumference} strokeDashoffset={circumference * (1 - percent / 100)} />
+    </svg>
+  );
+}
+
+/** The macOS pointer, resting on the notch. */
+function Cursor() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[30px] w-[30px] drop-shadow-md" aria-hidden="true">
+      <path d="M5 3l14 8.5-6.2 1.3L16 20l-2.6 1.1-3.2-7.2L5 18z" fill="#000" stroke="#fff" strokeWidth="1.4" strokeLinejoin="round" />
+    </svg>
+  );
 }
 
 function Row({ children }: { children: ReactNode }) {
@@ -210,13 +316,14 @@ function ExpandedMusic() {
   );
 }
 
-function Countdown() {
+function Countdown({ small = false }: { small?: boolean }) {
   const [seconds, setSeconds] = useState(4 * 60 + 53);
   useEffect(() => {
     const timer = window.setInterval(() => setSeconds((value) => (value > 0 ? value - 1 : 293)), 1000);
     return () => window.clearInterval(timer);
   }, []);
   const text = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+  if (small) return <span className="tabular-nums">{text}</span>;
   return <span className="font-mono text-[22px] font-bold tabular-nums text-[#f0a04b]">{text}</span>;
 }
 

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { NotchDemo } from "./components/NotchDemo";
 import { AppIcon, AppIconTile, type IconName } from "./components/AppIcon";
 import { DownloadCount } from "./components/DownloadCount";
+import { Intro } from "./components/Intro";
 import { site } from "./site";
 
 const reveal = {
@@ -15,6 +16,7 @@ const reveal = {
 export default function App() {
   return (
     <div className="overflow-x-hidden">
+      <Intro />
       <Nav />
       <main>
         <Hero />
@@ -174,7 +176,54 @@ function Features() {
 
         <Card className="md:col-span-2">
           <CardText glyph="tomato" title="Pomodoro">
-            Focus and break cycles with a quiet chime, counting down right at the top of your screen.
+            Focus and break cycles counting down at the top of your screen, with optional brown, pink or white noise to
+            focus by.
+          </CardText>
+        </Card>
+
+        <Card className="md:col-span-3">
+          <div className="-mx-7 -mt-7 mb-7 bg-gradient-to-b from-[#ebe1f2] to-transparent pb-6">
+            <MiniNotch width={210} height={50}>
+              <span className="mb-2 flex w-full items-center justify-center gap-4 self-end text-[12px] font-semibold text-white/85">
+                <span className="flex items-center gap-1.5"><AppIcon name="timer" size={13} color="#f0a04b" />04:12</span>
+                <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-[3px] bg-gradient-to-b from-[#f7c58b] to-[#7d4b6b]" />Golden Hour</span>
+              </span>
+            </MiniNotch>
+          </div>
+          <CardText glyph="glance" title="Glance">
+            Rest the pointer on the notch and a quiet row grows out under it: your timer counting down, the song playing,
+            your team's local time. It only shows. Clicking still opens the Library.
+          </CardText>
+        </Card>
+
+        <Card className="md:col-span-3">
+          <div className="-mx-7 -mt-7 mb-7 bg-gradient-to-b from-[#dff1e3] to-transparent pb-6">
+            <MiniNotch width={250} height={34}>
+              <AppIcon name="headphones" size={16} color="#f5f5f7" />
+              <span className="text-[14px] font-semibold text-[#30d158]">82%</span>
+            </MiniNotch>
+          </div>
+          <CardText glyph="headphones" title="Device animations">
+            Plug in the charger, or connect AirPods, earbuds or a speaker, and the notch greets it once with its logo and
+            battery. It waits its turn and never covers what you're doing.
+          </CardText>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardText glyph="globe" title="Team clocks">
+            Add the people you work with and their local time sits in the glance, so you know when to message.
+          </CardText>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardText glyph="haptics" title="A notch you can feel">
+            A light tap from the trackpad when the glance opens, a song flicks by or a device connects.
+          </CardText>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardText glyph="present" title="Presentation mode">
+            Mirroring to a projector or TV? The glance and album art step aside until you're done.
           </CardText>
         </Card>
 
@@ -241,7 +290,8 @@ function Privacy() {
           <h3 className="text-[26px] font-semibold tracking-[-0.02em]">Runs on your Mac. Sends nothing.</h3>
           <p className="mt-2 text-[16px] leading-relaxed text-cream/65">
             No account, no analytics, no servers. NotchOS asks only for what a feature needs, like Accessibility for the
-            volume keys, and works without the rest.
+            volume keys, and works without the rest. Presentation mode keeps your songs out of sight while you mirror
+            your screen.
           </p>
         </div>
       </motion.div>
@@ -249,8 +299,8 @@ function Privacy() {
   );
 }
 
-const free = ["The notch and volume / brightness HUD", "Lock screen moments", "Library with Alarms and Timer", "Liquid Glass or solid look"];
-const pro = ["Now Playing with album art and controls", "Pomodoro", "Tray & AirDrop", "Apple Shortcuts", "Keyboard shortcuts"];
+const free = ["The notch and volume / brightness HUD", "Lock screen moments", "Library with Alarms and Timer", "Haptics and presentation mode", "Liquid Glass or solid look"];
+const pro = ["Now Playing with album art and controls", "Glance with team clocks", "Device animations: charger, AirPods, speakers", "Pomodoro with focus sounds", "Tray & AirDrop", "Apple Shortcuts", "Keyboard shortcuts"];
 
 function Pricing() {
   return (
@@ -310,7 +360,7 @@ const faqs: { q: string; a: string }[] = [
   { q: "macOS says it can’t verify the developer. Is that OK?", a: "Yes. NotchOS isn’t notarized by Apple yet, so the first time you open it, go to System Settings → Privacy & Security and click Open Anyway next to NotchOS. After that it opens normally." },
   { q: "Which Macs does it work on?", a: `MacBooks with a notch running macOS 14 or later. On other displays NotchOS draws a virtual notch.` },
   { q: "How do I open it the first time?", a: "Right-click NotchOS in Applications and choose Open, or allow it in System Settings → Privacy & Security. You only do this once." },
-  { q: "What permissions does it need?", a: "Accessibility, to show the volume and brightness HUD, and permission to read Music or Spotify for album art. Everything else works without them." },
+  { q: "What permissions does it need?", a: "Accessibility, to show the volume and brightness HUD; permission to read Music or Spotify for album art; and Bluetooth, to greet your headphones with their battery. Everything else works without them." },
   { q: "How does the Pro licence work?", a: `Every Pro feature is free for ${site.trialDays} days. To get Pro, open Settings → License and click Email Licence Request: it sends your Mac ID to ${site.licenseEmail}. Your licence key comes back by reply; paste it in Settings → License.` },
 ];
 
