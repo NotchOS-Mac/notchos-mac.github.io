@@ -15,7 +15,7 @@ Thanks!`;
 export const site = {
   name: "NotchOS",
   /** The current release. Bump this (and the tag below follows) when a new DMG ships. */
-  version: "1.0.4",
+  version: "1.0.5",
   /** The DMG of exactly that release (public releases repo). */
   get downloadURL() {
     return `https://github.com/NotchOS-Mac/NotchOS-releases/releases/download/v${this.version}/NotchOS.dmg`;
