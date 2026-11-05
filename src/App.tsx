@@ -83,7 +83,7 @@ function Hero() {
             Get Pro · {site.proPrice}
           </a>
         </div>
-        <p className="label mt-5 text-[10px] text-muted">Free · {site.trialDays}-day Pro trial · {site.requirements}</p>
+        <p className="pixel mt-5 text-[10px] text-muted">Free · {site.trialDays}-day Pro trial · {site.requirements}</p>
       </motion.div>
 
       <motion.div {...reveal} transition={{ ...reveal.transition, delay: 0.15 }} className="mt-16">
@@ -278,7 +278,7 @@ function PriceCard({ name, price, note, items, cta, href, highlight = false, foo
 }) {
   return (
     <motion.div {...reveal} className={`glass relative flex flex-col rounded-[32px] p-8 ${highlight ? "ring-2 ring-ink/80" : ""}`}>
-      {highlight && <span className="label absolute right-6 top-6 rounded-full bg-ink px-3 py-1 text-[9px] text-cream">{site.trialDays}-day trial</span>}
+      {highlight && <span className="pixel absolute right-6 top-6 rounded-full bg-ink px-3 py-1 text-[9px] text-cream">{site.trialDays}-day trial</span>}
       <p className="text-[15px] font-medium text-ink-soft">{name}</p>
       <p className="mt-3 flex items-baseline gap-2">
         <span className="text-[52px] font-semibold tracking-[-0.04em]">{price}</span>

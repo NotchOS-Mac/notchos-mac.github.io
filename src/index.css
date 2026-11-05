@@ -9,6 +9,7 @@
   --color-line: rgba(23, 21, 15, 0.08);
   --color-amber: #e9973c;
   --color-rose: #e0607e;
+  --font-pixel: "Silkscreen", ui-monospace, monospace;
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
 }
 
@@ -41,6 +42,13 @@ body {
     0 1px 0 rgba(255, 255, 255, 0.9) inset,
     0 0 0 1px rgba(23, 21, 15, 0.04),
     0 18px 50px -24px rgba(60, 45, 20, 0.28);
+}
+
+/* Pixel font, kept for the trial lines only. */
+.pixel {
+  font-family: var(--font-pixel);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 /* Small uppercase labels (eyebrows, badges, price notes). */
