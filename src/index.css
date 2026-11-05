@@ -10,7 +10,6 @@
   --color-amber: #e9973c;
   --color-rose: #e0607e;
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
-  --font-pixel: "Silkscreen", ui-monospace, monospace;
 }
 
 html {
@@ -44,16 +43,14 @@ body {
     0 18px 50px -24px rgba(60, 45, 20, 0.28);
 }
 
-.pixel {
-  font-family: var(--font-pixel);
-  letter-spacing: 0.04em;
+/* Small uppercase labels (eyebrows, badges, price notes). */
+.label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.crisp {
-  image-rendering: pixelated;
-  shape-rendering: crispEdges;
-}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

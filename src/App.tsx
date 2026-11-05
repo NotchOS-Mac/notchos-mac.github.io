@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { NotchDemo } from "./components/NotchDemo";
-import { PixelIcon, type GlyphName } from "./components/PixelIcon";
+import { AppIcon, AppIconTile, type IconName } from "./components/AppIcon";
 import { site } from "./site";
 
 const reveal = {
@@ -63,7 +63,7 @@ function Hero() {
   return (
     <section className="px-5 pb-24 pt-16 md:pt-24">
       <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
-        <span className="pixel glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] text-ink-soft">
+        <span className="label glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] text-ink-soft">
           <span className="h-1.5 w-1.5 rounded-full bg-amber" /> for MacBooks with a notch
         </span>
         <h1 className="mt-7 text-[44px] font-semibold leading-[1.04] tracking-[-0.035em] md:text-[76px]">
@@ -83,7 +83,7 @@ function Hero() {
             Get Pro · {site.proPrice}
           </a>
         </div>
-        <p className="pixel mt-5 text-[10px] text-muted">Free · {site.trialDays}-day Pro trial · {site.requirements}</p>
+        <p className="label mt-5 text-[10px] text-muted">Free · {site.trialDays}-day Pro trial · {site.requirements}</p>
       </motion.div>
 
       <motion.div {...reveal} transition={{ ...reveal.transition, delay: 0.15 }} className="mt-16">
@@ -96,7 +96,7 @@ function Hero() {
 function SectionHeading({ eyebrow, title, children }: { eyebrow: string; title: ReactNode; children?: ReactNode }) {
   return (
     <motion.div {...reveal} className="mx-auto mb-12 max-w-2xl text-center">
-      <p className="pixel text-[10px] text-muted">{eyebrow}</p>
+      <p className="label text-[10px] text-muted">{eyebrow}</p>
       <h2 className="mt-3 text-[34px] font-semibold leading-tight tracking-[-0.03em] md:text-[48px]">{title}</h2>
       {children && <p className="mt-4 text-[17px] leading-relaxed text-ink-soft">{children}</p>}
     </motion.div>
@@ -111,12 +111,10 @@ function Card({ children, className = "" }: { children: ReactNode; className?: s
   );
 }
 
-function CardText({ glyph, title, children }: { glyph: GlyphName; title: string; children: ReactNode }) {
+function CardText({ glyph, title, children }: { glyph: IconName; title: string; children: ReactNode }) {
   return (
     <>
-      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink">
-        <PixelIcon name={glyph} size={18} color="#f6f1e8" />
-      </div>
+      <AppIconTile name={glyph} size={38} />
       <h3 className="mt-5 text-[21px] font-semibold tracking-[-0.02em]">{title}</h3>
       <p className="mt-2 text-[15px] leading-relaxed text-ink-soft">{children}</p>
     </>
@@ -145,7 +143,7 @@ function Features() {
         <Card className="md:col-span-4">
           <div className="-mx-7 -mt-7 mb-7 bg-gradient-to-b from-[#efe3d1] to-transparent pb-6">
             <MiniNotch width={250} height={34}>
-              <PixelIcon name="timer" size={16} color="#f0a04b" />
+              <AppIcon name="timer" size={16} color="#f0a04b" />
               <span className="font-mono text-[14px] font-bold text-[#f0a04b]">12:04</span>
             </MiniNotch>
           </div>
@@ -219,7 +217,7 @@ function Keyboard() {
         <span className="text-[22px] text-muted">→</span>
         <Keycap>T</Keycap>
         <div className="w-full" />
-        <div className="pixel mt-2 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] text-muted">
+        <div className="label mt-2 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] text-muted">
           <span>T · Timer</span>
           <span>A · Alarms</span>
           <span>P · Pomodoro</span>
@@ -236,7 +234,7 @@ function Privacy() {
     <section className="px-5 py-12">
       <motion.div {...reveal} className="mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-[34px] bg-ink px-8 py-14 text-center text-cream md:flex-row md:text-left">
         <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/10">
-          <PixelIcon name="lock" size={30} color="#f6f1e8" />
+          <AppIcon name="lock" size={30} color="#f6f1e8" />
         </div>
         <div>
           <h3 className="text-[26px] font-semibold tracking-[-0.02em]">Runs on your Mac. Sends nothing.</h3>
@@ -280,11 +278,11 @@ function PriceCard({ name, price, note, items, cta, href, highlight = false, foo
 }) {
   return (
     <motion.div {...reveal} className={`glass relative flex flex-col rounded-[32px] p-8 ${highlight ? "ring-2 ring-ink/80" : ""}`}>
-      {highlight && <span className="pixel absolute right-6 top-6 rounded-full bg-ink px-3 py-1 text-[9px] text-cream">{site.trialDays}-day trial</span>}
+      {highlight && <span className="label absolute right-6 top-6 rounded-full bg-ink px-3 py-1 text-[9px] text-cream">{site.trialDays}-day trial</span>}
       <p className="text-[15px] font-medium text-ink-soft">{name}</p>
       <p className="mt-3 flex items-baseline gap-2">
         <span className="text-[52px] font-semibold tracking-[-0.04em]">{price}</span>
-        <span className="pixel text-[10px] text-muted">{note}</span>
+        <span className="label text-[10px] text-muted">{note}</span>
       </p>
       <ul className="mt-6 flex-1 space-y-3">
         {items.map((item) => (
@@ -342,7 +340,7 @@ function Footer() {
           <Logo />
           <span>© 2026 {site.name}</span>
         </div>
-        <p className="pixel text-[10px]">Made for the top of your screen</p>
+        <p className="label text-[10px]">Made for the top of your screen</p>
         <a href={`mailto:${site.supportEmail}`} className="hover:text-ink">Support</a>
       </div>
     </footer>

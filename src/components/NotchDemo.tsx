@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { PixelIcon, type GlyphName } from "./PixelIcon";
+import { AppIcon, type IconName } from "./AppIcon";
 
 /** The demo display is drawn on a 1000-unit-wide canvas and scaled to fit; 1 pt of a real notch ≈ 1.43 units. */
 const BASE_WIDTH = 1000;
@@ -138,7 +138,7 @@ function NotchContent({ state }: { state: StateID }) {
     case "timer":
       return (
         <Row>
-          <PixelIcon name="timer" size={24} color="#f0a04b" />
+          <AppIcon name="timer" size={24} color="#f0a04b" />
           <Countdown />
         </Row>
       );
@@ -153,18 +153,17 @@ function Row({ children }: { children: ReactNode }) {
   return <div className="flex h-full items-center justify-between px-[22px]">{children}</div>;
 }
 
-/** Album art: a warm pixel sunset. */
+/** Album art: a warm sunset. */
 function AlbumArt({ size }: { size: number }) {
   return (
     <div
       className="relative shrink-0 overflow-hidden"
       style={{ width: size, height: size, borderRadius: size * 0.22, background: "linear-gradient(180deg,#f7c58b 0%,#ef8c62 55%,#7d4b6b 100%)" }}
     >
-      <svg viewBox="0 0 12 12" className="crisp absolute inset-0 h-full w-full">
-        <rect x="4" y="4" width="4" height="1" fill="#fff4d6" />
-        <rect x="3" y="5" width="6" height="2" fill="#fff4d6" />
-        <rect x="0" y="8" width="12" height="1" fill="#4b2d45" opacity="0.55" />
-        <rect x="0" y="9" width="12" height="3" fill="#3a2236" opacity="0.7" />
+      <svg viewBox="0 0 48 48" className="absolute inset-0 h-full w-full">
+        <circle cx="24" cy="24" r="9" fill="#fff4d6" />
+        <path d="M0 33 Q12 27 24 32 T48 31 V48 H0 Z" fill="#4b2d45" opacity="0.55" />
+        <path d="M0 38 Q14 33 28 37 T48 36 V48 H0 Z" fill="#3a2236" opacity="0.75" />
       </svg>
     </div>
   );
@@ -221,7 +220,7 @@ function Countdown() {
   return <span className="font-mono text-[22px] font-bold tabular-nums text-[#f0a04b]">{text}</span>;
 }
 
-const libraryApps: { glyph: GlyphName; color: string }[] = [
+const libraryApps: { glyph: IconName; color: string }[] = [
   { glyph: "alarm", color: "#f0a04b" },
   { glyph: "timer", color: "#ec8b3a" },
   { glyph: "tomato", color: "#e5534b" },
@@ -244,7 +243,7 @@ function Library() {
             animate={{ y: 0, opacity: centre ? 1 : 0.55 }}
             transition={{ delay: 0.15 + index * 0.04, ...spring }}
           >
-            <PixelIcon name={app.glyph} size={centre ? 30 : 24} color="#fff" />
+            <AppIcon name={app.glyph} size={centre ? 30 : 24} color="#fff" />
           </motion.div>
         );
       })}
@@ -267,7 +266,7 @@ function DropZone() {
           transition={{ duration: 1.6, delay: 0.9, times: [0, 0.4, 1] }}
           style={{ borderColor: "rgba(255,255,255,0.3)", backgroundColor: "rgba(255,255,255,0.04)" }}
         >
-          <PixelIcon name={box.glyph} size={30} color="#fff" />
+          <AppIcon name={box.glyph} size={30} color="#fff" />
           <span className="text-[17px] font-semibold text-white">{box.label}</span>
         </motion.div>
       ))}
@@ -278,7 +277,7 @@ function DropZone() {
         animate={{ top: [240, 150, 108], opacity: [0, 1, 0], rotate: [-8, -3, 0], scale: [1, 1, 0.7] }}
         transition={{ duration: 1.8, delay: 0.2, times: [0, 0.6, 1], ease: "easeOut" }}
       >
-        <PixelIcon name="file" size={26} color="#17150f" />
+        <AppIcon name="file" size={26} color="#17150f" />
       </motion.div>
     </div>
   );
