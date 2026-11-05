@@ -1,22 +1,26 @@
-import { motion } from "motion/react";
+import { MotionConfig, motion } from "motion/react";
 import type { ReactNode } from "react";
 import { NotchDemo } from "./components/NotchDemo";
 import { AppIcon, AppIconTile, type IconName } from "./components/AppIcon";
 import { DownloadCount } from "./components/DownloadCount";
 import { Intro } from "./components/Intro";
+import { ScaleWords, ScrollNotch, TiltOnScroll, WakeNotch, useRecede, wake } from "./components/Motion";
+import { introPlays, useHandoff, useIntroDone } from "./lib/intro";
 import { site } from "./site";
 
 const reveal = {
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
+  initial: { opacity: 0, y: 28, scale: 0.97 },
+  whileInView: { opacity: 1, y: 0, scale: 1 },
   viewport: { once: true, margin: "-80px" },
-  transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  transition: { type: "spring", stiffness: 170, damping: 24 },
 } as const;
 
 export default function App() {
   return (
+    <MotionConfig reducedMotion="user">
     <div className="overflow-x-hidden">
       <Intro />
+      <ScrollNotch />
       <Nav />
       <main>
         <Hero />
@@ -28,6 +32,7 @@ export default function App() {
       </main>
       <Footer />
     </div>
+    </MotionConfig>
   );
 }
 
@@ -63,34 +68,73 @@ function Logo() {
 }
 
 function Hero() {
+  // The hero wakes up as the intro flies into the screen, then recedes gently as you scroll on.
+  const ready = useIntroDone();
+  const landed = useHandoff();
+  // With the opening film, the title and MacBook arrive from the film itself and take over in place.
+  const filmed = introPlays();
+  const recede = useRecede();
+  const show = (delay: number) => ({
+    initial: { opacity: 0, y: 18, scale: 0.96 },
+    animate: ready ? { opacity: 1, y: 0, scale: 1 } : undefined,
+    transition: { ...wake, delay },
+  });
+
   return (
-    <section className="px-5 pb-24 pt-16 md:pt-24">
-      <motion.div {...reveal} className="mx-auto max-w-3xl text-center">
-        <span className="label glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[10px] text-ink-soft">
+    <section ref={recede.ref} className="px-5 pb-24 pt-16 md:pt-24">
+      <motion.div style={recede.style} className="mx-auto max-w-3xl text-center">
+        {/* The badge pops like the Dynamic Island: a dot that springs open into a pill. */}
+        <motion.span
+          className="label glass inline-flex items-center gap-2 overflow-hidden whitespace-nowrap rounded-full px-3.5 py-1.5 text-[10px] text-ink-soft"
+          initial={{ opacity: 0, scale: 0.2 }}
+          animate={ready ? { opacity: 1, scale: 1 } : undefined}
+          transition={{ type: "spring", stiffness: 320, damping: 18 }}
+        >
           <span className="h-1.5 w-1.5 rounded-full bg-amber" /> for MacBooks with a notch
-        </span>
-        <h1 className="mt-7 text-[44px] font-semibold leading-[1.04] tracking-[-0.035em] md:text-[76px]">
-          The notch
-          <br />
-          <span className="text-ink-soft">just woke up.</span>
+        </motion.span>
+        <h1 id="hero-title" className="mt-7 text-[44px] font-semibold leading-[1.04] tracking-[-0.035em] md:text-[76px]">
+          {filmed ? (
+            // The film's title glides here and lands exactly on these words; they appear the instant it does.
+            <span style={{ opacity: landed ? 1 : 0 }}>
+              The notch
+              <br />
+              <span className="text-ink-soft">just woke up.</span>
+            </span>
+          ) : (
+            <>
+              <ScaleWords text="The notch" start={ready} delay={0.15} />
+              <br />
+              <ScaleWords text="just woke up." start={ready} delay={0.4} className="text-ink-soft" />
+            </>
+          )}
         </h1>
-        <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-ink-soft md:text-[19px]">
+        <motion.p {...show(0.75)} className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-ink-soft md:text-[19px]">
           NotchOS turns the black cut-out at the top of your MacBook into a live surface for music, timers, files and
           shortcuts. It springs open when you need it and disappears when you don't.
-        </p>
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+        </motion.p>
+        <motion.div {...show(0.9)} className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <a href={site.downloadURL} className="rounded-full bg-ink px-7 py-3.5 text-[15px] font-medium text-cream shadow-[0_12px_30px_-12px_rgba(23,21,15,0.7)] transition-transform hover:scale-[1.03]">
             Download for Mac
           </a>
           <a href="#pricing" className="glass rounded-full px-7 py-3.5 text-[15px] font-medium transition-transform hover:scale-[1.03]">
             Get Pro · {site.proPrice}
           </a>
-        </div>
-        <p className="pixel mt-5 text-[10px] text-muted">Free · {site.trialDays}-day Pro trial · {site.requirements}</p>
+        </motion.div>
+        <motion.p {...show(1.05)} className="pixel mt-5 text-[10px] text-muted">Free · {site.trialDays}-day Pro trial · {site.requirements}</motion.p>
       </motion.div>
 
-      <motion.div {...reveal} transition={{ ...reveal.transition, delay: 0.15 }} className="mt-16">
-        <NotchDemo />
+      {/* The MacBook rises in last, then tilts up to face you as you scroll to it. */}
+      <motion.div
+        id="hero-demo"
+        className="mt-16"
+        initial={filmed ? { opacity: 0 } : { opacity: 0, y: 70 }}
+        animate={ready ? { opacity: 1, y: 0 } : undefined}
+        // Filmed: a crossfade with the film's MacBook as it settles here. Otherwise it rises in last.
+        transition={filmed ? { delay: 0.6, duration: 0.55 } : { ...wake, delay: 1.1 }}
+      >
+        <TiltOnScroll>
+          <NotchDemo />
+        </TiltOnScroll>
       </motion.div>
     </section>
   );
@@ -100,7 +144,15 @@ function SectionHeading({ eyebrow, title, children }: { eyebrow: string; title: 
   return (
     <motion.div {...reveal} className="mx-auto mb-12 max-w-2xl text-center">
       <p className="label text-[10px] text-muted">{eyebrow}</p>
-      <h2 className="mt-3 text-[34px] font-semibold leading-tight tracking-[-0.03em] md:text-[48px]">{title}</h2>
+      <motion.h2
+        className="mt-3 text-[34px] font-semibold leading-tight tracking-[-0.03em] md:text-[48px]"
+        initial={{ opacity: 0, scale: 0.86, filter: "blur(12px)" }}
+        whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ ...wake, delay: 0.08 }}
+      >
+        {title}
+      </motion.h2>
       {children && <p className="mt-4 text-[17px] leading-relaxed text-ink-soft">{children}</p>}
     </motion.div>
   );
@@ -124,17 +176,6 @@ function CardText({ glyph, title, children }: { glyph: IconName; title: string; 
   );
 }
 
-/** A small black notch used inside feature cards. */
-function MiniNotch({ width, height, children }: { width: number; height: number; children?: ReactNode }) {
-  return (
-    <div className="mx-auto flex justify-center">
-      <div className="flex items-center justify-between bg-black px-4" style={{ width, height, borderRadius: `0 0 ${Math.min(height / 2, 26)}px ${Math.min(height / 2, 26)}px` }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function Features() {
   return (
     <section id="features" className="scroll-mt-28 px-5 py-24">
@@ -145,10 +186,10 @@ function Features() {
       <div className="mx-auto grid max-w-5xl gap-5 md:grid-cols-6">
         <Card className="md:col-span-4">
           <div className="-mx-7 -mt-7 mb-7 bg-gradient-to-b from-[#efe3d1] to-transparent pb-6">
-            <MiniNotch width={250} height={34}>
+            <WakeNotch width={250} height={34}>
               <AppIcon name="timer" size={16} color="#f0a04b" />
               <span className="font-mono text-[14px] font-bold text-[#f0a04b]">12:04</span>
-            </MiniNotch>
+            </WakeNotch>
           </div>
           <CardText glyph="timer" title="Live Activities">
             A running timer, a song or a snoozed alarm stays live beside the camera. Two at once share the notch, and a
@@ -183,12 +224,12 @@ function Features() {
 
         <Card className="md:col-span-3">
           <div className="-mx-7 -mt-7 mb-7 bg-gradient-to-b from-[#ebe1f2] to-transparent pb-6">
-            <MiniNotch width={210} height={50}>
+            <WakeNotch width={210} height={50}>
               <span className="mb-2 flex w-full items-center justify-center gap-4 self-end text-[12px] font-semibold text-white/85">
                 <span className="flex items-center gap-1.5"><AppIcon name="timer" size={13} color="#f0a04b" />04:12</span>
                 <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-[3px] bg-gradient-to-b from-[#f7c58b] to-[#7d4b6b]" />Golden Hour</span>
               </span>
-            </MiniNotch>
+            </WakeNotch>
           </div>
           <CardText glyph="glance" title="Glance">
             Rest the pointer on the notch and a quiet row grows out under it: your timer counting down, the song playing,
@@ -198,10 +239,10 @@ function Features() {
 
         <Card className="md:col-span-3">
           <div className="-mx-7 -mt-7 mb-7 bg-gradient-to-b from-[#dff1e3] to-transparent pb-6">
-            <MiniNotch width={250} height={34}>
+            <WakeNotch width={250} height={34}>
               <AppIcon name="headphones" size={16} color="#f5f5f7" />
               <span className="text-[14px] font-semibold text-[#30d158]">82%</span>
-            </MiniNotch>
+            </WakeNotch>
           </div>
           <CardText glyph="headphones" title="Device animations">
             Plug in the charger, or connect AirPods, earbuds or a speaker, and the notch greets it once with its logo and
@@ -243,13 +284,17 @@ function Features() {
   );
 }
 
-function Keycap({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
+function Keycap({ children, wide = false, press = 0 }: { children: ReactNode; wide?: boolean; press?: number }) {
   return (
-    <span
+    <motion.span
+      initial={{ y: 0 }}
+      whileInView={{ y: [0, 5, 0] }}
+      viewport={{ once: true, margin: "-120px" }}
+      transition={{ delay: 0.5 + press * 0.32, duration: 0.32, times: [0, 0.35, 1] }}
       className={`inline-flex h-16 items-center justify-center rounded-2xl border border-white bg-gradient-to-b from-white to-[#efe8dc] text-[22px] font-medium text-ink shadow-[0_2px_0_#d9cfbf,0_10px_20px_-10px_rgba(60,45,20,0.35)] ${wide ? "w-44" : "w-16"}`}
     >
       {children}
-    </span>
+    </motion.span>
   );
 }
 
@@ -261,11 +306,11 @@ function Keyboard() {
         Settings.
       </SectionHeading>
       <motion.div {...reveal} className="glass mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-4 rounded-[34px] px-6 py-12">
-        <Keycap>⌃</Keycap>
+        <Keycap press={0}>⌃</Keycap>
         <span className="text-[22px] text-muted">+</span>
-        <Keycap wide>space</Keycap>
+        <Keycap wide press={0.15}>space</Keycap>
         <span className="text-[22px] text-muted">→</span>
-        <Keycap>T</Keycap>
+        <Keycap press={1.2}>T</Keycap>
         <div className="w-full" />
         <div className="label mt-2 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] text-muted">
           <span>T · Timer</span>

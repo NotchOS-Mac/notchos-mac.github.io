@@ -48,7 +48,7 @@ export function NotchDemo() {
   return (
     <div className="mx-auto w-full max-w-5xl">
       {/* MacBook lid: a thin dark bezel around the top of the display. */}
-      <div className="rounded-t-[34px] bg-[#1b1a18] p-[10px] pb-0 shadow-[0_40px_80px_-40px_rgba(40,28,10,0.45)]">
+      <div id="hero-lid" className="rounded-t-[34px] bg-[#1b1a18] p-[10px] pb-0 shadow-[0_40px_80px_-40px_rgba(40,28,10,0.45)]">
         <div ref={wrapper} className="relative overflow-hidden rounded-t-[24px]" style={{ height: BASE_HEIGHT * scale }}>
           <div className="absolute left-0 top-0 origin-top-left" style={{ width: BASE_WIDTH, height: BASE_HEIGHT, transform: `scale(${scale})` }}>
             <Wallpaper />
