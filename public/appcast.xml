@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>NotchOS</title>
+    <link>https://notchos-mac.github.io/appcast.xml</link>
+    <description>New versions of NotchOS.</description>
+    <language>en</language>
+    <item>
+      <title>NotchOS 1.0.8</title>
+      <pubDate>Fri, 06 Nov 2026 07:25:02 +0000</pubDate>
+      <sparkle:version>12</sparkle:version>
+      <sparkle:shortVersionString>1.0.8</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <sparkle:releaseNotesLink>https://github.com/NotchOS-Mac/NotchOS-releases/releases/tag/v1.0.8</sparkle:releaseNotesLink>
+      <enclosure url="https://github.com/NotchOS-Mac/NotchOS-releases/releases/download/v1.0.8/NotchOS.dmg" length="5521852" type="application/octet-stream" sparkle:edSignature="mla6AZF2OtSi1lMiP78y24gpiT6D2N+zU3T7jv5igteSSCtye7X5HmmBa9fYKmXoD+oy4xyYo4+rbRxo3RUgBQ==" />
+    </item>
+  </channel>
+</rss>
