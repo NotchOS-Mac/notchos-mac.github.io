@@ -24,7 +24,9 @@ export const site = {
   buyURL: `mailto:${licenseEmail}?subject=${encodeURIComponent("NotchOS Pro licence request")}&body=${encodeURIComponent(requestBody)}`,
   licenseEmail,
   supportEmail: licenseEmail,
-  proPrice: "$12",
+  proPrice: "$8",
+  /** Launch offer shown with the Pro price. */
+  launchOffer: "The first 10 customers get a surprise price on their licence.",
   trialDays: 3,
   requirements: "macOS 14 or later · MacBook with a notch",
 };

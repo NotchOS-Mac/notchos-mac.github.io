@@ -121,6 +121,7 @@ function Hero() {
           </a>
         </motion.div>
         <motion.p {...show(1.05)} className="pixel mt-5 text-[10px] text-muted">Free · {site.trialDays}-day Pro trial · {site.requirements}</motion.p>
+        <motion.p {...show(1.15)} className="mt-3 text-[13px] font-medium text-ink-soft">🎁 {site.launchOffer}</motion.p>
       </motion.div>
 
       {/* The MacBook rises in last, then tilts up to face you as you scroll to it. */}
@@ -356,13 +357,14 @@ function Pricing() {
       <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-2">
         <PriceCard name="Free" price="$0" note="Forever" items={free} cta="Download" href={site.downloadURL} />
         <PriceCard name="Pro" price={site.proPrice} note="One-time" items={pro} cta="Request a licence" href={site.buyURL} highlight
+          offer={site.launchOffer}
           footnote="Easiest from the app: Settings → License → Email Licence Request. Your Mac ID is filled in for you." />
       </div>
     </section>
   );
 }
 
-function PriceCard({ name, price, note, items, cta, href, highlight = false, footnote }: {
+function PriceCard({ name, price, note, items, cta, href, highlight = false, footnote, offer }: {
   name: string;
   price: string;
   note: string;
@@ -371,6 +373,7 @@ function PriceCard({ name, price, note, items, cta, href, highlight = false, foo
   href: string;
   highlight?: boolean;
   footnote?: string;
+  offer?: string;
 }) {
   return (
     <motion.div {...reveal} className={`glass relative flex flex-col rounded-[32px] p-8 ${highlight ? "ring-2 ring-ink/80" : ""}`}>
@@ -380,6 +383,11 @@ function PriceCard({ name, price, note, items, cta, href, highlight = false, foo
         <span className="text-[52px] font-semibold tracking-[-0.04em]">{price}</span>
         <span className="label text-[10px] text-muted">{note}</span>
       </p>
+      {offer && (
+        <p className="mt-4 rounded-2xl bg-[#e9973c]/15 px-4 py-3 text-[14px] font-medium leading-snug text-ink">
+          🎁 {offer}
+        </p>
+      )}
       <ul className="mt-6 flex-1 space-y-3">
         {items.map((item) => (
           <li key={item} className="flex items-start gap-3 text-[15px] text-ink-soft">
