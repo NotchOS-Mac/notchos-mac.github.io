@@ -6,13 +6,13 @@
     <description>New versions of NotchOS.</description>
     <language>en</language>
     <item>
-      <title>NotchOS 1.0.11</title>
-      <pubDate>Fri, 06 Nov 2026 12:49:02 +0000</pubDate>
-      <sparkle:version>15</sparkle:version>
-      <sparkle:shortVersionString>1.0.11</sparkle:shortVersionString>
+      <title>NotchOS 1.0.12</title>
+      <pubDate>Fri, 06 Nov 2026 17:09:26 +0000</pubDate>
+      <sparkle:version>16</sparkle:version>
+      <sparkle:shortVersionString>1.0.12</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-      <sparkle:releaseNotesLink>https://github.com/NotchOS-Mac/NotchOS-releases/releases/tag/v1.0.11</sparkle:releaseNotesLink>
-      <enclosure url="https://github.com/NotchOS-Mac/NotchOS-releases/releases/download/v1.0.11/NotchOS.dmg" length="5628740" type="application/octet-stream" sparkle:edSignature="PgI1BLj9gNeEwJFs12VY/xhaLT3ht78V0Rdv6YhhXS+TIXVzgq6/KSlrXX+9J6Vp9irItkVtr0AeS0UXbNESBQ==" />
+      <sparkle:releaseNotesLink>https://github.com/NotchOS-Mac/NotchOS-releases/releases/tag/v1.0.12</sparkle:releaseNotesLink>
+      <enclosure url="https://github.com/NotchOS-Mac/NotchOS-releases/releases/download/v1.0.12/NotchOS.dmg" length="5634936" type="application/octet-stream" sparkle:edSignature="bz44ecrZXFsTHMB+8szeNxZ0QNfI3Sq5M0asYXUCv9UyLLtiglGm3gxzjE//76wPNHvYOzcdLHWlXUIco6rLCA==" />
     </item>
   </channel>
 </rss>
