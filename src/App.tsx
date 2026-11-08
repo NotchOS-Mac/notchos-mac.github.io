@@ -439,6 +439,22 @@ function FAQ() {
 function Footer() {
   return (
     <footer className="px-5 pb-12 pt-10">
+      <div className="mb-8 flex justify-center">
+        <a
+          href="https://macnative.io/apps/notchos?utm_source=macnative-badge&utm_medium=referral"
+          target="_blank"
+          rel="noopener"
+          className="transition-transform hover:scale-[1.03]"
+        >
+          <img
+            src="https://macnative.io/badge?kind=listed&theme=default&slug=notchos"
+            alt="Listed on MacNative"
+            width={212}
+            height={58}
+            loading="lazy"
+          />
+        </a>
+      </div>
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 border-t border-line pt-8 text-[13px] text-muted md:flex-row">
         <div className="flex items-center gap-2.5">
           <Logo />
