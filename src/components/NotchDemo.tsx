@@ -1,27 +1,48 @@
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { AppIcon, type IconName } from "./AppIcon";
+import { AppIcon } from "./AppIcon";
+import { Player } from "./Features";
+import { AlbumArt, Ear, Equalizer, GooFilter } from "./NotchParts";
 
-/** The demo display is drawn on a 1000-unit-wide canvas and scaled to fit; 1 pt of a real notch ≈ 1.43 units. */
+/**
+ * The hero's MacBook screen with the notch running through what it does. Sizes, corner radii and the
+ * black-into-glass look are the app's own (in points, ×PT for the demo's 1000-unit canvas).
+ */
 const BASE_WIDTH = 1000;
 const BASE_HEIGHT = 360;
 const PT = 1.43;
+/** The camera's height: the notch is solid black down to here, then eases into glass. */
+const CAMERA = 32;
 
-type StateID = "idle" | "music" | "musicOpen" | "timer" | "glance" | "airpods" | "library" | "drop";
+type StateID = "music" | "musicOpen" | "timer" | "two" | "swap" | "glance" | "headphones" | "notes" | "library" | "drop" | "idle";
 
-const states: Record<StateID, { label: string; width: number; height: number; top: number; bottom: number }> = {
+type Shape = { label: string; width: number; height: number; top: number; bottom: number };
+// Compact pills use the collapsed size's grown radii capped at half the height (16 / 16), expanded layouts 31 / 40.
+const states: Record<StateID, Shape> = {
+  music: { label: "Music", width: 261, height: 32, top: 16, bottom: 16 },
+  musicOpen: { label: "Player", width: 440, height: 180, top: 31, bottom: 40 },
+  timer: { label: "Timer", width: 280, height: 32, top: 16, bottom: 16 },
+  two: { label: "Two at once", width: 280, height: 32, top: 16, bottom: 16 },
+  swap: { label: "Swap", width: 261, height: 32, top: 16, bottom: 16 },
+  glance: { label: "Glance", width: 300, height: 52, top: 26, bottom: 26 },
+  headphones: { label: "Headphones", width: 280, height: 32, top: 16, bottom: 16 },
+  notes: { label: "Quick Notes", width: 400, height: 112, top: 31, bottom: 40 },
+  library: { label: "Library", width: 300, height: 110, top: 31, bottom: 40 },
+  drop: { label: "Drop files", width: 420, height: 140, top: 31, bottom: 40 },
   idle: { label: "Resting", width: 184, height: 31, top: 3, bottom: 9 },
-  music: { label: "Music", width: 261, height: 32, top: 6, bottom: 16 },
-  musicOpen: { label: "Expanded", width: 420, height: 120, top: 18, bottom: 34 },
-  timer: { label: "Timer", width: 300, height: 32, top: 6, bottom: 16 },
-  glance: { label: "Glance", width: 230, height: 52, top: 6, bottom: 16 },
-  airpods: { label: "AirPods", width: 300, height: 32, top: 6, bottom: 16 },
-  library: { label: "Library", width: 260, height: 105, top: 18, bottom: 34 },
-  drop: { label: "Drop files", width: 420, height: 140, top: 18, bottom: 34 },
 };
 
-const tour: StateID[] = ["music", "musicOpen", "timer", "glance", "airpods", "library", "drop", "idle"];
+/** What the bubble beside the notch shows in each state (none: no bubble). */
+const bubbleFor: Partial<Record<StateID, "music" | "timer">> = { two: "music", swap: "timer" };
+
+/** The bubble: 34 × 24 pt with the notch's corner radius (up to half its height), 10 pt right of the pill. */
+const BUBBLE = { width: 34, height: 24, radius: 12, gap: 10 };
+/** Tucked into the notch's right edge, shrunk, as in the app's swap. */
+const TUCK = -(BUBBLE.gap + BUBBLE.width + 2) * PT;
+
+const tour: StateID[] = ["music", "musicOpen", "timer", "two", "swap", "glance", "headphones", "notes", "library", "drop", "idle"];
 const spring = { type: "spring", stiffness: 260, damping: 28, mass: 0.9 } as const;
+const bubbleSpring = { type: "spring", stiffness: 210, damping: 19, mass: 0.9 } as const;
 
 export function NotchDemo() {
   const [scale, setScale] = useState(1);
@@ -37,13 +58,36 @@ export function NotchDemo() {
     return () => observer.disconnect();
   }, []);
 
+  // The tour only runs while the demo is on screen.
+  const [visible, setVisible] = useState(true);
   useEffect(() => {
-    if (paused) return;
+    const element = wrapper.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting));
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (paused || !visible) return;
     const timer = window.setTimeout(() => setState((current) => tour[(tour.indexOf(current) + 1) % tour.length]), 3400);
     return () => window.clearTimeout(timer);
-  }, [state, paused]);
+  }, [state, paused, visible]);
 
   const shape = states[state];
+  const bubble = bubbleFor[state];
+  const size = { width: shape.width * PT, height: shape.height * PT };
+  const radius = { borderBottomLeftRadius: shape.bottom * PT, borderBottomRightRadius: shape.bottom * PT };
+  // The bubble's spot beside the pill, from the notch's centre line.
+  const bubbleLeft = (shape.width / 2 + BUBBLE.gap) * PT;
+  const bubbleTop = ((shape.height - BUBBLE.height) / 2) * PT;
+  const bubbleBox = { width: BUBBLE.width * PT, height: BUBBLE.height * PT, borderRadius: BUBBLE.radius * PT, top: bubbleTop };
+  const bubbleMotion = {
+    initial: { x: TUCK, scale: 0.65, opacity: 0, left: bubbleLeft },
+    animate: { x: 0, scale: 1, opacity: 1, left: bubbleLeft },
+    exit: { x: TUCK, scale: 0.65, opacity: 0, transition: { ...bubbleSpring, opacity: { delay: 0.12, duration: 0.15 } } },
+    transition: { ...bubbleSpring, left: spring, opacity: { duration: 0.15 } },
+  };
 
   return (
     <div className="mx-auto w-full max-w-5xl">
@@ -53,6 +97,7 @@ export function NotchDemo() {
           <div className="absolute left-0 top-0 origin-top-left" style={{ width: BASE_WIDTH, height: BASE_HEIGHT, transform: `scale(${scale})` }}>
             <Wallpaper />
             <MenuBar />
+            <GooFilter id="goo-demo" blur={7} />
             <AnimatePresence>
               {state === "glance" && (
                 <motion.div
@@ -66,16 +111,29 @@ export function NotchDemo() {
                 </motion.div>
               )}
             </AnimatePresence>
-            <div className="absolute left-1/2 top-0 -translate-x-1/2">
+
+            {/* A zero-width anchor on the screen's centre line; the notch is centred on it. */}
+            <div className="absolute left-1/2 top-0 flex w-0 justify-center">
+              {/* Underneath, melted together: the liquid bridge as the bubble leaves or rejoins the notch. */}
+              {/* (A filter needs a box of its own to draw in, so this layer spans the whole screen.) The pill
+                  under the notch is only there while the notch is compact, when the notch is solid black anyway:
+                  under the glass of an open notch it would show through. */}
+              <div className="absolute top-0" style={{ left: -BASE_WIDTH / 2, width: BASE_WIDTH, height: BASE_HEIGHT, filter: "url(#goo-demo)" }} aria-hidden="true">
+                <div className="absolute top-0" style={{ left: BASE_WIDTH / 2 }}>
+                  <motion.div className="absolute top-0 bg-black" initial={false}
+                    animate={{ ...size, x: -size.width / 2, ...radius, opacity: shape.height <= CAMERA ? 1 : 0 }}
+                    transition={{ ...spring, opacity: { duration: 0.12 } }} />
+                  <AnimatePresence mode="wait">
+                    {bubble && <motion.div key={bubble} className="absolute bg-black" style={bubbleBox} {...bubbleMotion} />}
+                  </AnimatePresence>
+                </div>
+              </div>
+
               <motion.div
-                className="relative bg-black"
+                className="notch-glass relative shrink-0"
+                style={{ ["--solid" as string]: `${CAMERA * PT}px` }}
                 initial={false}
-                animate={{
-                  width: shape.width * PT,
-                  height: shape.height * PT,
-                  borderBottomLeftRadius: shape.bottom * PT,
-                  borderBottomRightRadius: shape.bottom * PT,
-                }}
+                animate={{ ...size, ...radius }}
                 transition={spring}
                 onHoverStart={() => setPaused(true)}
                 onHoverEnd={() => setPaused(false)}
@@ -84,17 +142,25 @@ export function NotchDemo() {
                 <Ear side="right" radius={shape.top * PT} />
                 <AnimatePresence mode="popLayout" initial={false}>
                   <motion.div
-                    key={state}
+                    key={state === "two" ? "timer" : state === "swap" ? "music" : state}
                     className="absolute inset-0 overflow-hidden"
                     style={{ borderRadius: "inherit" }}
-                    initial={{ opacity: 0, filter: "blur(6px)", scale: 0.92 }}
-                    animate={{ opacity: 1, filter: "blur(0px)", scale: 1, transition: { delay: 0.12, duration: 0.32 } }}
-                    exit={{ opacity: 0, filter: "blur(6px)", scale: 0.96, transition: { duration: 0.14 } }}
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1, transition: { delay: 0.12, duration: 0.3 } }}
+                    exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.14 } }}
                   >
                     <NotchContent state={state} />
                   </motion.div>
                 </AnimatePresence>
               </motion.div>
+
+              <AnimatePresence mode="wait">
+                {bubble && (
+                  <motion.div key={bubble} className="absolute flex items-center justify-center bg-black" style={bubbleBox} {...bubbleMotion}>
+                    {bubble === "music" ? <Equalizer height={15} bar={3.4} /> : <MiniRing percent={64} color="#f0a04b" />}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -110,7 +176,7 @@ export function NotchDemo() {
               setState(id);
               setPaused(true);
             }}
-            className={`rounded-full px-4 py-2 text-[13px] font-medium transition-all duration-300 ${
+            className={`rounded-full px-4 py-2 text-[13px] font-medium transition-colors duration-300 ${
               state === id ? "bg-ink text-cream shadow-[0_6px_20px_-8px_rgba(23,21,15,0.6)]" : "glass text-ink-soft hover:text-ink"
             }`}
           >
@@ -122,35 +188,26 @@ export function NotchDemo() {
   );
 }
 
-/** The concave corner where the notch meets the top edge of the screen. */
-function Ear({ side, radius }: { side: "left" | "right"; radius: number }) {
-  return (
-    <motion.span
-      className="absolute top-0"
-      initial={false}
-      animate={{ width: radius, height: radius, [side]: -radius + 0.5 }}
-      transition={spring}
-      style={{
-        background: `radial-gradient(circle at ${side === "left" ? "0 100%" : "100% 100%"}, transparent 70%, #000 71%)`,
-      }}
-    />
-  );
-}
-
 function NotchContent({ state }: { state: StateID }) {
   switch (state) {
     case "idle":
       return null;
     case "music":
+    case "swap":
       return (
         <Row>
           <AlbumArt size={28} />
-          <Equalizer />
+          <Equalizer height={20} />
         </Row>
       );
     case "musicOpen":
-      return <ExpandedMusic />;
+      return (
+        <div className="flex h-full items-end justify-center pb-[23px]">
+          <Player scale={PT} />
+        </div>
+      );
     case "timer":
+    case "two":
       return (
         <Row>
           <AppIcon name="timer" size={24} color="#f0a04b" />
@@ -159,20 +216,37 @@ function NotchContent({ state }: { state: StateID }) {
       );
     case "glance":
       return <GlanceRow />;
-    case "airpods":
+    case "headphones":
       return (
         <Row>
           <motion.div initial={{ scale: 0.4, opacity: 0, y: -6 }} animate={{ scale: 1, opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 300, damping: 16, delay: 0.15 }}>
-            <AirPodsGlyph />
+            <AppIcon name="headphones" size={26} color="#f5f5f7" />
           </motion.div>
           <BatteryRing percent={82} />
         </Row>
       );
+    case "notes":
+      return <NoteTaking />;
     case "library":
       return <Library />;
     case "drop":
       return <DropZone />;
   }
+}
+
+/** Quick Notes: listening, and the words arriving as you speak. */
+function NoteTaking() {
+  return (
+    <div className="flex h-full flex-col justify-end px-[34px] pb-[24px]">
+      <span className="flex items-center gap-[9px] text-[15px] font-semibold text-white/60">
+        <span className="pulse-dot h-[11px] w-[11px] rounded-full bg-[#ff453a]" /> Listening · hold ⌃ Space
+      </span>
+      <p className="mt-[10px] flex items-center text-[20px] text-white">
+        <span className="typing whitespace-nowrap">Call Sam about the launch</span>
+        <span className="caret ml-[2px] inline-block h-[22px] w-[2px] bg-[#ffcc00]" />
+      </p>
+    </div>
+  );
 }
 
 /** The glance: rest the pointer on the notch and a quiet row grows out under it. */
@@ -193,23 +267,12 @@ function GlanceRow() {
           <AlbumArt size={19} />
           Golden Hour
         </span>
+        <span className="flex items-center gap-[7px]">
+          <AppIcon name="globe" size={17} color="#64d2ff" />
+          Ana 9:41
+        </span>
       </motion.div>
     </div>
-  );
-}
-
-/** AirPods, drawn for the site (Apple's symbols can't be used on the web). */
-function AirPodsGlyph() {
-  return (
-    <svg viewBox="0 0 40 28" className="h-[30px] w-[42px]" aria-label="AirPods">
-      {[{ head: 12, stem: 13.2, grille: 9.6 }, { head: 28, stem: 22.8, grille: 30.4 }].map((bud) => (
-        <g key={bud.head}>
-          <ellipse cx={bud.head} cy="9" rx="7" ry="6.4" fill="#f5f5f7" />
-          <rect x={bud.stem} y="10" width="4" height="15.5" rx="2" fill="#f5f5f7" />
-          <ellipse cx={bud.grille} cy="8.6" rx="2" ry="1.3" fill="#b9b9be" />
-        </g>
-      ))}
-    </svg>
   );
 }
 
@@ -256,64 +319,7 @@ function Cursor() {
 }
 
 function Row({ children }: { children: ReactNode }) {
-  return <div className="flex h-full items-center justify-between px-[22px]">{children}</div>;
-}
-
-/** Album art: a warm sunset. */
-function AlbumArt({ size }: { size: number }) {
-  return (
-    <div
-      className="relative shrink-0 overflow-hidden"
-      style={{ width: size, height: size, borderRadius: size * 0.22, background: "linear-gradient(180deg,#f7c58b 0%,#ef8c62 55%,#7d4b6b 100%)" }}
-    >
-      <svg viewBox="0 0 48 48" className="absolute inset-0 h-full w-full">
-        <circle cx="24" cy="24" r="9" fill="#fff4d6" />
-        <path d="M0 33 Q12 27 24 32 T48 31 V48 H0 Z" fill="#4b2d45" opacity="0.55" />
-        <path d="M0 38 Q14 33 28 37 T48 36 V48 H0 Z" fill="#3a2236" opacity="0.75" />
-      </svg>
-    </div>
-  );
-}
-
-function Equalizer({ height = 20, color = "#f06b8b" }: { height?: number; color?: string }) {
-  return (
-    <div className="flex items-center gap-[3px]" style={{ height }}>
-      {[0, 0.25, 0.5, 0.15].map((delay, index) => (
-        <motion.span
-          key={index}
-          className="w-[4px] rounded-full"
-          style={{ background: color }}
-          animate={{ height: [height * 0.3, height, height * 0.45, height * 0.85, height * 0.3] }}
-          transition={{ duration: 1.1 + index * 0.13, repeat: Infinity, ease: "easeInOut", delay }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function ExpandedMusic() {
-  return (
-    <div className="flex h-full flex-col justify-end px-[34px] pb-[24px]">
-      <div className="flex items-center gap-[18px]">
-        <AlbumArt size={64} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[19px] font-semibold text-white">Golden Hour Loop</p>
-          <p className="truncate text-[15px] text-white/50">Mira Vale</p>
-        </div>
-        <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="#f4c542">
-          <path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.5 1.3 6.6L12 17.3 6.1 20.5l1.3-6.6L2.5 9.4l6.6-.8z" />
-        </svg>
-        <div className="flex items-center gap-[20px] pl-[10px] text-white">
-          <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="currentColor"><path d="M11 6v12L2 12zm11 0v12l-9-6z" /></svg>
-          <svg viewBox="0 0 24 24" className="h-[28px] w-[28px]" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z" /></svg>
-          <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" fill="currentColor"><path d="M13 6v12l9-6zM2 6v12l9-6z" /></svg>
-        </div>
-      </div>
-      <div className="mt-[16px] h-[6px] w-full overflow-hidden rounded-full bg-white/20">
-        <motion.div className="h-full rounded-full bg-white/90" initial={{ width: "34%" }} animate={{ width: "62%" }} transition={{ duration: 3.2, ease: "linear" }} />
-      </div>
-    </div>
-  );
+  return <div className="flex h-full items-center justify-between px-[24px]">{children}</div>;
 }
 
 function Countdown({ small = false }: { small?: boolean }) {
@@ -327,30 +333,25 @@ function Countdown({ small = false }: { small?: boolean }) {
   return <span className="font-mono text-[22px] font-bold tabular-nums text-[#f0a04b]">{text}</span>;
 }
 
-const libraryApps: { glyph: IconName; color: string }[] = [
-  { glyph: "alarm", color: "#f0a04b" },
-  { glyph: "timer", color: "#ec8b3a" },
-  { glyph: "tomato", color: "#e5534b" },
-  { glyph: "note", color: "#e8607f" },
-  { glyph: "bolt", color: "#6f63e6" },
-];
+const libraryApps = ["alarm", "timer", "tomato", "note", "bolt"] as const;
+const libraryColors = ["#f0a04b", "#ec8b3a", "#e5534b", "#e8607f", "#6f63e6"];
 
 function Library() {
   return (
     <div className="flex h-full items-end justify-center gap-[16px] pb-[30px]">
-      {libraryApps.map((app, index) => {
+      {libraryApps.map((glyph, index) => {
         const centre = index === 2;
         const size = centre ? 66 : 52;
         return (
           <motion.div
-            key={app.glyph}
+            key={glyph}
             className="flex items-center justify-center rounded-full"
-            style={{ width: size, height: size, background: app.color, opacity: centre ? 1 : 0.55, filter: centre ? "none" : "blur(0.6px)" }}
+            style={{ width: size, height: size, background: libraryColors[index] }}
             initial={{ y: 8, opacity: 0 }}
             animate={{ y: 0, opacity: centre ? 1 : 0.55 }}
             transition={{ delay: 0.15 + index * 0.04, ...spring }}
           >
-            <AppIcon name={app.glyph} size={centre ? 30 : 24} color="#fff" />
+            <AppIcon name={glyph} size={centre ? 30 : 24} color="#fff" />
           </motion.div>
         );
       })}
@@ -380,9 +381,10 @@ function DropZone() {
       {/* A file being dragged up into the Tray. */}
       <motion.div
         className="absolute left-[22%] flex h-[56px] w-[46px] items-center justify-center rounded-[8px] bg-white shadow-xl"
-        initial={{ top: 240, opacity: 0, rotate: -8 }}
-        animate={{ top: [240, 150, 108], opacity: [0, 1, 0], rotate: [-8, -3, 0], scale: [1, 1, 0.7] }}
+        initial={{ y: 240, opacity: 0, rotate: -8 }}
+        animate={{ y: [240, 150, 108], opacity: [0, 1, 0], rotate: [-8, -3, 0], scale: [1, 1, 0.7] }}
         transition={{ duration: 1.8, delay: 0.2, times: [0, 0.6, 1], ease: "easeOut" }}
+        style={{ top: 0 }}
       >
         <AppIcon name="file" size={26} color="#17150f" />
       </motion.div>
@@ -390,36 +392,44 @@ function DropZone() {
   );
 }
 
-/** A calm desktop: layered sand dunes in cream and clay. */
+/** A dusk desktop, like macOS's own: an indigo sky warming to the horizon over plum dunes. */
+export const wallpaperSky = ["#2a2347", "#c9775c"] as const;
+
 function Wallpaper() {
   return (
     <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1000 360" preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f8efe2" />
-          <stop offset="1" stopColor="#efd9c0" />
+          <stop offset="0" stopColor={wallpaperSky[0]} />
+          <stop offset="0.55" stopColor="#7a4d76" />
+          <stop offset="1" stopColor={wallpaperSky[1]} />
         </linearGradient>
+        <radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#ffd9a0" />
+          <stop offset="1" stopColor="#ffd9a0" stopOpacity="0" />
+        </radialGradient>
       </defs>
       <rect width="1000" height="360" fill="url(#sky)" />
-      <circle cx="770" cy="150" r="46" fill="#fbe7c6" />
-      <path d="M0 230 C 180 180, 320 250, 520 215 S 860 170, 1000 210 L1000 360 L0 360Z" fill="#e8c8a6" />
-      <path d="M0 270 C 220 240, 380 300, 600 268 S 880 236, 1000 262 L1000 360 L0 360Z" fill="#ddb48f" />
-      <path d="M0 312 C 260 292, 460 340, 700 310 S 920 296, 1000 306 L1000 360 L0 360Z" fill="#cf9e78" />
+      <circle cx="760" cy="215" r="120" fill="url(#sun)" opacity="0.55" />
+      <circle cx="760" cy="215" r="34" fill="#ffe2b8" />
+      <path d="M0 230 C 180 190, 320 250, 520 222 S 860 182, 1000 214 L1000 360 L0 360Z" fill="#8a4f62" />
+      <path d="M0 272 C 220 246, 380 300, 600 272 S 880 244, 1000 266 L1000 360 L0 360Z" fill="#5e3550" />
+      <path d="M0 314 C 260 296, 460 340, 700 312 S 920 300, 1000 308 L1000 360 L0 360Z" fill="#3b2339" />
     </svg>
   );
 }
 
 function MenuBar() {
   return (
-    <div className="absolute inset-x-0 top-0 flex h-[44px] items-center justify-between bg-white/35 px-[26px] text-[15px] text-ink backdrop-blur-md">
+    <div className="absolute inset-x-0 top-0 flex h-[44px] items-center justify-between bg-[#1a1328]/25 px-[26px] text-[15px] text-white">
       <div className="flex items-center gap-[22px]">
         <span className="font-semibold">NotchOS</span>
-        <span className="text-ink-soft">File</span>
-        <span className="text-ink-soft">Edit</span>
-        <span className="text-ink-soft">View</span>
+        <span className="text-white/75">File</span>
+        <span className="text-white/75">Edit</span>
+        <span className="text-white/75">View</span>
       </div>
-      <div className="flex items-center text-ink-soft">
-        <span className="tabular-nums">Tue 4 Nov 9:41</span>
+      <div className="flex items-center text-white/80">
+        <span className="tabular-nums">Sun 8 Nov 9:41</span>
       </div>
     </div>
   );

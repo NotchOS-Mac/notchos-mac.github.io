@@ -1,4 +1,4 @@
-import { AlarmClock, Brain, Eye, FileText, Globe, Headphones, Inbox, KeyRound, Lock, Music, Presentation, Radio, Sun, Timer, Vibrate, Zap, type LucideIcon } from "lucide-react";
+import { AlarmClock, AudioLines, Brain, Droplet, Eye, FileText, FlipHorizontal, Globe, Headphones, Inbox, KeyRound, LayoutGrid, Lightbulb, Lock, Mic, Music, Presentation, Radio, RefreshCw, Sparkles, Sun, Timer, Vibrate, Zap, type LucideIcon } from "lucide-react";
 
 /**
  * The app's icons. In NotchOS they are SF Symbols in a circle of the app's colour (Pomodoro is
@@ -22,6 +22,14 @@ const icons = {
   globe: { icon: Globe, tint: "#30B0C7" }, // Team clocks
   haptics: { icon: Vibrate, tint: "#8E8E93" }, // Haptic feedback
   present: { icon: Presentation, tint: "#1C1C1E" }, // Presentation mode
+  mic: { icon: Mic, tint: "#FFCC00" }, // Quick Notes: mic, yellow like Notes
+  memo: { icon: AudioLines, tint: "#FF3B30" }, // Voice Memos: waveform, red
+  mirror: { icon: FlipHorizontal, tint: "#5AC8FA" }, // Mirror
+  light: { icon: Lightbulb, tint: "#FFB340" }, // Edge Light
+  sparkles: { icon: Sparkles, tint: "#AF52DE" }, // Welcome tour
+  droplet: { icon: Droplet, tint: "#64D2FF" }, // Liquid Glass look
+  grid: { icon: LayoutGrid, tint: "#8E8E93" }, // Library
+  update: { icon: RefreshCw, tint: "#34C759" }, // Updates
 } satisfies Record<string, { icon: LucideIcon; tint: string }>;
 
 export type IconName = keyof typeof icons;

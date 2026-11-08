@@ -23,25 +23,52 @@ html {
 
 body {
   font-family: var(--font-sans);
-  /* A faint pixel grid, like looking very closely at a display. */
+  min-height: 100vh;
+}
+
+/*
+ * The page's backdrop: a faint pixel grid over a warm glow. It sits on its own fixed layer, so the browser
+ * paints it once and only moves the page over it while scrolling (a `background-attachment: fixed` body
+ * is repainted on every scroll frame).
+ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-image:
     radial-gradient(rgba(23, 21, 15, 0.055) 1px, transparent 1px),
     radial-gradient(120% 80% at 50% -10%, #fffdf8 0%, var(--color-cream) 55%, var(--color-cream-deep) 100%);
   background-size: 8px 8px, 100% 100%;
-  background-attachment: fixed;
-  min-height: 100vh;
+  transform: translateZ(0);
 }
 
-/* Frosted, curved glass panels. */
+/*
+ * Cards and buttons: frosted-looking, without a live blur. Blurring what's behind every card costs a GPU
+ * pass per card per scroll frame; over the page's flat backdrop a soft white gradient looks the same.
+ */
 .glass {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.46));
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.58));
+  border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.9) inset,
     0 0 0 1px rgba(23, 21, 15, 0.04),
-    0 18px 50px -24px rgba(60, 45, 20, 0.28);
+    0 14px 34px -22px rgba(60, 45, 20, 0.32);
+}
+
+/* The page's one live blur: the floating nav bar, which really has content scrolling under it. */
+.frost {
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 1px rgba(23, 21, 15, 0.04), 0 10px 30px -18px rgba(60, 45, 20, 0.35);
+}
+
+/* The notch's look in the app: solid black through the camera's height, then easing off into glass. */
+.notch-glass {
+  background: linear-gradient(180deg, #000 0, #000 var(--solid, 60%), rgba(10, 7, 12, var(--glass-bottom, 0.6)) 100%);
 }
 
 /* Pixel font, kept for the trial lines only. */
@@ -59,10 +86,224 @@ body {
   text-transform: uppercase;
 }
 
+/*
+ * Scroll reveal. Where the browser supports scroll-driven animations, each card rises into place as it
+ * scrolls in, tied to the scroll position and run off the main thread. `--d` staggers neighbours.
+ * Elsewhere (`.no-sda`, set by `useScrollEffects`) a class is added once the card is on screen.
+ */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(56px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: rise linear both;
+    animation-timeline: view();
+    animation-range: entry calc(var(--d, 0) * 8%) cover calc(24% + var(--d, 0) * 8%);
+  }
+}
+
+.no-sda .reveal {
+  opacity: 0;
+  transform: translateY(40px) scale(0.94);
+  transition:
+    opacity 0.6s ease,
+    transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(var(--d, 0) * 70ms);
+}
+
+.no-sda .reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* The bubble leaving the notch as its card scrolls in (the app's swap travel: tucked and shrunk → its place). */
+@keyframes bubble-out {
+  0%,
+  30% {
+    transform: translateX(var(--tuck, -40px)) scale(0.65);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .bubble-out {
+    animation: bubble-out linear both;
+    animation-timeline: view();
+    animation-range: entry 40% cover 48%;
+  }
+}
+
+.no-sda .bubble-out {
+  transform: translateX(var(--tuck, -40px)) scale(0.65);
+  transition: transform 0.9s cubic-bezier(0.3, 1.4, 0.5, 1) 0.35s;
+}
+
+.no-sda .in .bubble-out {
+  transform: none;
+}
+
+/* Loops inside cards: transform and opacity only, so they never trigger layout. */
+@keyframes eq {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  30% {
+    transform: scaleY(1);
+  }
+  60% {
+    transform: scaleY(0.45);
+  }
+  80% {
+    transform: scaleY(0.85);
+  }
+}
+
+.eq-bar {
+  transform-origin: center;
+  animation: eq 1.1s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
+
+.pulse-dot {
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.caret {
+  animation: caret 1s steps(1) infinite;
+}
+
+/* Typing: the text appears letter by letter with the caret following it, holds, then starts over.
+   `--tw` is the full text's width (em). A tiny inline box, so the per-step layout costs nothing. */
+@keyframes type {
+  0% {
+    max-width: 0;
+  }
+  55%,
+  92% {
+    max-width: var(--tw, 12.6em);
+  }
+  100% {
+    max-width: 0;
+  }
+}
+
+.typing {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  animation: type 7s steps(25) infinite;
+}
+
+/* The skip button's slide, as in Apple Music: the front triangle slides out, a new one grows in behind. */
+@keyframes skip-back {
+  0%,
+  70% {
+    transform: translateX(0) scale(0);
+    opacity: 0;
+  }
+  86%,
+  100% {
+    transform: translateX(62%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes skip-mid {
+  0%,
+  70% {
+    transform: translateX(0);
+  }
+  86%,
+  100% {
+    transform: translateX(62%);
+  }
+}
+
+@keyframes skip-front {
+  0%,
+  70% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  86%,
+  100% {
+    transform: translateX(62%) scale(0.65);
+    opacity: 0;
+  }
+}
+
+.skip-loop > :nth-child(1) {
+  animation: skip-back 4s cubic-bezier(0.3, 0.7, 0.2, 1) infinite;
+}
+.skip-loop > :nth-child(2) {
+  animation: skip-mid 4s cubic-bezier(0.3, 0.7, 0.2, 1) infinite;
+}
+.skip-loop > :nth-child(3) {
+  animation: skip-front 4s cubic-bezier(0.3, 0.7, 0.2, 1) infinite;
+}
+
+/* The album art flipping to the next song, in step with the skip. */
+@keyframes art-flip {
+  0%,
+  72% {
+    transform: perspective(300px) rotateY(0);
+  }
+  86% {
+    transform: perspective(300px) rotateY(90deg);
+  }
+  100% {
+    transform: perspective(300px) rotateY(0);
+  }
+}
+
+.art-flip {
+  animation: art-flip 4s ease-in-out infinite;
+}
+
+/* Loops rest while their card is off screen (`useScrollEffects` toggles this). */
+.idle,
+.idle * {
+  animation-play-state: paused !important;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
     transition-duration: 0.001ms !important;
+  }
+  .no-sda .reveal,
+  .no-sda .bubble-out {
+    opacity: 1;
+    transform: none;
   }
 }

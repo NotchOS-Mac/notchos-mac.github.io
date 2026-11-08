@@ -61,35 +61,6 @@ export function ScrollNotch() {
 }
 
 /**
- * A small notch inside a card that wakes up when it scrolls into view: it starts as a resting notch and
- * springs open to its full size, then its content fades in.
- */
-export function WakeNotch({ width, height, children }: { width: number; height: number; children?: ReactNode }) {
-  const radius = Math.min(height / 2, 26);
-  return (
-    <div className="mx-auto flex justify-center">
-      <motion.div
-        className="flex items-center justify-between overflow-hidden bg-black px-4"
-        initial={{ width: 116, height: 22, borderBottomLeftRadius: 9, borderBottomRightRadius: 9 }}
-        whileInView={{ width, height, borderBottomLeftRadius: radius, borderBottomRightRadius: radius }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ ...wake, delay: 0.15 }}
-      >
-        <motion.div
-          className="flex h-full w-full items-center justify-between"
-          initial={{ opacity: 0, filter: "blur(6px)" }}
-          whileInView={{ opacity: 1, filter: "blur(0px)" }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ delay: 0.5, duration: 0.35 }}
-        >
-          {children}
-        </motion.div>
-      </motion.div>
-    </div>
-  );
-}
-
-/**
  * The MacBook tilting up to face you as it scrolls into view, the way product pages present hardware.
  */
 export function TiltOnScroll({ children }: { children: ReactNode }) {

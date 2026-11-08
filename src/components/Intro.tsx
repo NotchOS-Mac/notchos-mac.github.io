@@ -177,12 +177,13 @@ function Stage({ phase }: { phase: number }) {
     <svg viewBox="0 0 720 500" className="block h-auto w-full overflow-visible">
       <defs>
         <linearGradient id="intro-screen" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fffdf8" />
-          <stop offset="1" stopColor="#ece4d6" />
+          <stop offset="0" stopColor="#2a2347" />
+          <stop offset="0.55" stopColor="#7a4d76" />
+          <stop offset="1" stopColor="#c9775c" />
         </linearGradient>
       </defs>
 
-      {/* The screen lighting up: the site's own cream. */}
+      {/* The screen lighting up: the demo's dusk wallpaper. */}
       <motion.rect
         x="46" y="26" width="628" height="398" rx="14" fill="url(#intro-screen)"
         initial={{ opacity: 0 }}
