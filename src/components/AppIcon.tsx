@@ -1,4 +1,4 @@
-import { AlarmClock, AudioLines, Brain, Droplet, Eye, FileText, FlipHorizontal, Globe, Headphones, Inbox, KeyRound, LayoutGrid, Lightbulb, Lock, Mic, Music, Presentation, Radio, RefreshCw, Sparkles, Sun, Timer, Vibrate, Zap, type LucideIcon } from "lucide-react";
+import { AlarmClock, AudioLines, Brain, Droplet, Eye, FileText, FlipHorizontal, Globe, Headphones, Inbox, KeyRound, LayoutGrid, Lightbulb, Lock, Mic, Music, Presentation, Radio, RefreshCw, Sparkle, Sparkles, Sun, Timer, Vibrate, Zap, type LucideIcon } from "lucide-react";
 
 /**
  * The app's icons. In NotchOS they are SF Symbols in a circle of the app's colour (Pomodoro is
@@ -30,6 +30,7 @@ const icons = {
   droplet: { icon: Droplet, tint: "#64D2FF" }, // Liquid Glass look
   grid: { icon: LayoutGrid, tint: "#8E8E93" }, // Library
   update: { icon: RefreshCw, tint: "#34C759" }, // Updates
+  claude: { icon: Sparkle, tint: "#D97757" }, // Claude Code sessions
 } satisfies Record<string, { icon: LucideIcon; tint: string }>;
 
 export type IconName = keyof typeof icons;

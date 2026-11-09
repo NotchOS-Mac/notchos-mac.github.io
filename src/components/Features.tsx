@@ -277,7 +277,7 @@ function Glance() {
         </MiniNotch>
       </Screen>
       <Caption title="Glance" glyph="glance" className="px-6 pb-6">
-        Hover the notch for what's happening now.
+        Hover the notch for what's happening now. Play or skip right there.
       </Caption>
     </Tile>
   );
@@ -334,7 +334,7 @@ export function Features() {
     <div className="mx-auto grid max-w-6xl grid-flow-row-dense grid-cols-2 gap-3 md:auto-rows-[124px] md:grid-cols-6 md:gap-4 lg:grid-cols-12">
       <LiveActivities />
       <NowPlaying />
-      <Small glyph="grid" title="Library" d={1}>Every app, two keys away.</Small>
+      <Small glyph="grid" title="Library" d={1}>Every app, side by side or two keys away.</Small>
       <Small glyph="bolt" title="Apple Shortcuts" d={2}>Your shortcuts, one click away.</Small>
       <QuickNotes />
       <VoiceMemos />
@@ -342,6 +342,7 @@ export function Features() {
       <Small glyph="mirror" title="Mirror" d={0}>Check yourself before a call.</Small>
       <Small glyph="light" title="Edge Light" d={1}>A soft light for video calls.</Small>
       <Small glyph="alarm" title="Alarms & Timer" d={2}>Right in the notch.</Small>
+      <Small glyph="claude" title="Claude Code" d={3}>Your sessions, live in the notch.</Small>
       <Glance />
       <Devices />
       <Tray />
