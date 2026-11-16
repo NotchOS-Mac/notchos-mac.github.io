@@ -167,7 +167,7 @@ function NowPlaying() {
   return (
     <Tile size="l" d={1} className="flex flex-col md:flex-row">
       <Caption title="Now Playing" glyph="note" className="order-2 p-7 md:order-1 md:w-[42%] md:self-end">
-        Album art, controls and AirPlay, right under the camera.
+        Music, Spotify, YouTube and more. Art, controls and AirPlay, right under the camera.
       </Caption>
       <Screen tint="#f3dde3" className="order-1 flex flex-1 justify-center md:order-2 md:items-start">
         <MiniNotch width={300} height={150} top={22} bottom={30} solid={0.24} centered={false} className="md:mr-6">
